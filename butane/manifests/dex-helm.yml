@@ -1,0 +1,73 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  namespace: kube-system
+  name: dex
+spec:
+  targetNamespace: dex
+  createNamespace: true
+  version:
+  chart: dex
+  repo: https://charts.dexidp.io
+  valuesContent: |-
+    config:
+      # Set it to a valid URL
+      issuer: https://dex.homelab.evilcyborgdrone.com
+
+      # See https://dexidp.io/docs/storage/ for more options
+      storage:
+        type: memory
+
+      # Enable at least one connector
+      # See https://dexidp.io/docs/connectors/ for more options
+      connectors:
+        - type: github
+          # Required field for connector id.
+          id: github
+          # Required field for connector name.
+          name: GitHub
+          config:
+            # Credentials can be string literals or pulled from the environment.
+            clientID: $GITHUB_CLIENT_ID
+            clientSecret: $GITHUB_CLIENT_SECRET
+            redirectURI: https://dex.homelab.evilcyborgdrone.com/callback
+            orgs:
+              - name: farrell-white
+            teamNameField: slug
+            useLoginAsID: false
+
+      staticClients:
+        - id: "kube-apiserver"
+          public: true
+          redirectURIs:
+            - http://localhost:8000
+            - https://k8s-dashboard.homelab.evilcyborgdrone.com/oauth2/callback
+          name: kube-apiserver
+
+    envVars:
+      - name: GITHUB_CLIENT_ID
+        valueFrom:
+          secretKeyRef:
+            name: github-oauth-credentials
+            key: client-id
+      - name: GITHUB_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: github-oauth-credentials
+            key: client-secret
+
+    ingress:
+      enabled: true
+      hosts:
+        - host: dex.homelab.evilcyborgdrone.com
+          paths:
+            - path: /
+              pathType: Prefix
+      annotations:
+        kubernetes.io/ingress.class: "nginx"
+        cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      tls:
+        - hosts:
+            - dex.homelab.evilcyborgdrone.com
+          secretName: dex-tls

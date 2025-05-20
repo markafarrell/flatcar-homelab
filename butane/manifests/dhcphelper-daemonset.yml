@@ -1,0 +1,32 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: dhcphelper
+  namespace: pihole
+  labels:
+    k8s-app: dhcphelper
+spec:
+  selector:
+    matchLabels:
+      name: dhcphelper
+  template:
+    metadata:
+      labels:
+        name: dhcphelper
+    spec:
+      containers:
+        - name: dhcphelper
+          image: homeall/dhcphelper:2025.04.15
+
+          env:
+            - name: IP
+              value: "10.0.2.254"
+            - name: TZ
+              value: "Australia/Hobart"
+
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+      hostNetwork: true

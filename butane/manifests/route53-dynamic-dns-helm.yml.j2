@@ -1,0 +1,16 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  namespace: kube-system
+  name: route53-dynamic-dns
+spec:
+  targetNamespace: route53-dynamic-dns
+  createNamespace: true
+  version: 1.0.0
+  chart: route53-dynamic-dns
+  repo: https://markafarrell.github.io/helm-charts/
+  valuesContent: |-
+    env:
+      ROUTE53_DOMAIN: '*.homelab.evilcyborgdrone.com'
+      ROUTE53_HOSTED_ZONE_ID: "{{ ROUTE53_HOSTED_ZONE_ID }}"

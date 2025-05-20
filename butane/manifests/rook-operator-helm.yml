@@ -1,0 +1,13 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  namespace: kube-system
+  name: rook-ceph
+spec:
+  targetNamespace: rook-ceph
+  createNamespace: true
+  version: v1.17.1
+  chart: rook-ceph
+  repo: https://charts.rook.io/release
+  valuesContent:

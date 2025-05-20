@@ -1,0 +1,20 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  namespace: kube-system
+  name: fronius-exporter
+spec:
+  targetNamespace: fronius-exporter
+  createNamespace: true
+  version: 0.8.1
+  chart: fronius-exporter
+  repo: https://ccremer.github.io/charts
+  valuesContent: |-
+    image:
+      registry: ghcr.io
+      repository: ccremer/fronius-exporter
+      tag: v0.12.0
+      pullPolicy: IfNotPresent
+    exporter:
+      symoUrl: "http://10.0.3.1"

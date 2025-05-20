@@ -1,0 +1,17 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  namespace: kube-system
+  name: ingress-nginx
+spec:
+  targetNamespace: ingress-nginx
+  createNamespace: true
+  version: 4.12.1
+  chart: ingress-nginx
+  repo: https://kubernetes.github.io/ingress-nginx
+  valuesContent: |-
+    controller:
+      service:
+        annotations:
+          metallb.universe.tf/loadBalancerIPs: 10.0.2.2

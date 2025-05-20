@@ -1,0 +1,184 @@
+---
+variant: flatcar
+version: 1.0.0
+kernel_arguments:
+  should_exist:
+    - console=ttyS0,115200n8
+    - console=tty1
+    - flatcar.autologin
+    - usbcore.autosuspend=-1
+    - hostname={{ HOSTNAME }}
+    - systemd.clock_usec={{ TIMESTAMP_NS }}
+    # - ip={{ IP_ADDRESS }}::{{ GATEWAY }}:{{ NETMASK }}::enabcm6e4ei0:none:{{ DNS_SERVERS }}
+    - ip={{ IP_ADDRESS }}::{{ GATEWAY }}:{{ NETMASK }}::eth0:none:{{ DNS_SERVERS }}
+    - acpi=off
+    # - earlycon
+    # - earlyprintk
+    # - debug
+
+passwd:
+  users:
+    - name: opksshuser
+      no_create_home: true
+      shell: /sbin/nologin
+      uid: 999
+      primary_group: opksshuser
+      no_user_group: true
+  groups:
+    - name: opksshuser
+      gid: 999
+      system: true
+
+storage:
+  files:
+    # opkssh
+    - path: /opt/extensions/opkssh/opkssh-v0.5.1-arm64.raw
+      contents:
+        local: sysext/opkssh-v0.5.1-arm64.raw
+    - path: /etc/opk/providers
+      mode: 0640
+      group:
+        id: 999
+      contents:
+        inline: |
+          # Issuer Client-ID expiration-policy
+          https://accounts.google.com 206584157355-7cbe4s640tvm7naoludob4ut1emii7sf.apps.googleusercontent.com 24h
+    - path: /etc/opk/auth_id
+      mode: 0640
+      group:
+        id: 999
+      contents:
+        inline: |
+          core {{ OPKSSH_GOOGLE_EMAIL }} https://accounts.google.com
+    - path: /var/log/opkssh.log
+      mode: 0660
+      group:
+        id: 999
+      contents:
+        inline: ''
+    - path: /etc/sudoers.d/okpsshuser
+      contents:
+        inline: |
+          opksshuser ALL=(ALL) NOPASSWD: /usr/local/bin/opkssh readhome *
+    - path: /etc/ssh/sshd_config.d/99-opkssh.conf
+      contents:
+        inline: |
+          AuthorizedKeysCommand /usr/local/bin/opkssh verify %u %k %t
+          AuthorizedKeysCommandUser opksshuser
+
+    # rke2
+    - path: /opt/extensions/rke2/rke2-v1.31.3+k3s1-arm64.raw
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/rke2-v1.31.1+rke2r1-arm64.raw
+    - path: /etc/sysupdate.rke2.d/rke2-v1.31.conf
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/rke2-v1.31.conf
+    - path: /etc/sysupdate.d/noop.conf
+      contents:
+        source: https://github.com/flatcar/sysext-bakery/releases/download/latest/noop.conf
+    - path: /etc/rancher/rke2/config.yaml
+      contents:
+        inline: |
+          disable:
+            - rke2-ingress-nginx
+          write-kubeconfig-mode: "0644"
+          {% if not KUBE_PRIMARY == '1' %}server: https://{{ KUBE_VIP_ADDRESS }}:9345{% endif %}
+          token: {{ RKE2_TOKEN }}
+          tls-san:
+            - k.lan
+            - {{ HOSTNAME }}.lan
+            - {{ KUBE_VIP_ADDRESS }}
+          kube-apiserver-arg:
+            - "oidc-issuer-url=https://dex.homelab.evilcyborgdrone.com"
+            - "oidc-client-id=kube-apiserver"
+            - "oidc-username-claim=email"
+            - "oidc-groups-claim=groups"
+
+    - path: /var/lib/rancher/rke2/server/manifests/kubeapi-oidc-rbac.yml
+      contents:
+        local: butane/manifests/rendered/kubeapi-oidc-rbac.yml
+
+    # ingress-nginx
+    - path: /var/lib/rancher/rke2/server/manifests/ingress-nginx.yml
+      contents:
+        local: butane/manifests/rendered/ingress-nginx.yml
+
+    # kube-vip
+    - path: /var/lib/rancher/rke2/server/manifests/kubevip-helm.yml
+      contents:
+        local: butane/manifests/rendered/kubevip-helm.yml
+
+    # metallb
+    - path: /var/lib/rancher/rke2/server/manifests/metallb-helm.yml
+      contents:
+        local: butane/manifests/rendered/metallb-helm.yml
+
+    - path: /var/lib/rancher/rke2/server/manifests/metallb-ip-address-pool.yml
+      contents:
+        local: butane/manifests/rendered/metallb-ip-address-pool.yml
+
+    - path: /var/lib/rancher/rke2/server/manifests/metallb-l2-advertisement.yml
+      contents:
+        local: butane/manifests/rendered/metallb-l2-advertisement.yml
+
+    # cert-manager
+    - path: /var/lib/rancher/rke2/server/manifests/cert-manager-helm.yml
+      contents:
+        local: butane/manifests/rendered/cert-manager-helm.yml
+
+    - path: /var/lib/rancher/rke2/server/manifests/cert-manager-let-encypt-prod.yml
+      contents:
+        local: butane/manifests/rendered/cert-manager-let-encypt-prod.yml
+
+    # dex
+    - path: /var/lib/rancher/rke2/server/manifests/dex-helm.yml
+      contents:
+        local: butane/manifests/rendered/dex-helm.yml
+
+    - path: /var/lib/rancher/rke2/server/manifests/dex-github-secret.yml
+      contents:
+        local: butane/manifests/rendered/dex-github-secret.yml
+
+    # route53-dynamic-dns
+    - path: /var/lib/rancher/rke2/server/manifests/route53-dynamic-dns-helm.yml
+      contents:
+        local: butane/manifests/rendered/route53-dynamic-dns-helm.yml
+
+    - path: /var/lib/rancher/rke2/server/manifests/route53-dynamic-dns-secret.yml
+      contents:
+        local: butane/manifests/rendered/route53-dynamic-dns-secret.yml
+
+    # pihole
+    - path: /var/lib/rancher/rke2/server/manifests/pihole-helm.yml
+      contents:
+        local: butane/manifests/rendered/pihole-helm.yml
+
+    - path: /var/lib/rancher/rke2/server/manifests/dhcphelper-daemonset.yml
+      contents:
+        local: butane/manifests/rendered/dhcphelper-daemonset.yml
+
+
+  links:
+    - target: /opt/extensions/rke2/rke2-v1.31.3+k3s1-arm64.raw
+      path: /etc/extensions/rke2.raw
+      hard: false
+    - path: /etc/systemd/system/multi-user.target.wants/rke2-server.service
+      target: /usr/local/lib/systemd/system/rke2-server.service
+      overwrite: true
+    - target: /opt/extensions/opkssh/opkssh-v0.5.1-arm64.raw
+      path: /etc/extensions/opkssh.raw
+      hard: false
+
+systemd:
+  units:
+    - name: systemd-sysupdate.timer
+      enabled: true
+    - name: systemd-sysupdate.service
+      dropins:
+        - name: rke2.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/rke2.raw > /tmp/rke2"
+            ExecStartPre=/usr/lib/systemd/systemd-sysupdate -C rke2 update
+            ExecStartPost=/usr/bin/sh -c "readlink --canonicalize /etc/extensions/rke2.raw > /tmp/rke2-new"
+            ExecStartPost=/usr/bin/sh -c "if ! cmp --silent /tmp/rke2 /tmp/rke2-new; then touch /run/reboot-required; fi"

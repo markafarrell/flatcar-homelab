@@ -1,0 +1,13 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  namespace: kube-system
+  name: kured
+spec:
+  targetNamespace: kured
+  createNamespace: true
+  version: 5.6.1
+  chart: kured
+  repo:  https://kubereboot.github.io/charts
+  valuesContent:

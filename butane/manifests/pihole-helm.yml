@@ -1,0 +1,51 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  namespace: kube-system
+  name: pihole
+spec:
+  targetNamespace: pihole
+  createNamespace: true
+  version: 2.29.1
+  chart: pihole
+  repo: https://mojo2600.github.io/pihole-kubernetes/
+  valuesContent: |-
+    capabilities:
+      add:
+        - NET_ADMIN
+    serviceWeb:
+      type: LoadBalancer
+      annotations:
+        metallb.universe.tf/allow-shared-ip: pihole-svc
+        metallb.universe.tf/loadBalancerIPs: 10.0.2.254
+
+    serviceDns:
+      mixedService: true
+      type: LoadBalancer
+      annotations:
+        metallb.universe.tf/allow-shared-ip: pihole-svc
+        metallb.universe.tf/loadBalancerIPs: 10.0.2.254
+
+    serviceDhcp:
+      type: LoadBalancer
+      annotations:
+        metallb.universe.tf/allow-shared-ip: pihole-svc
+        metallb.universe.tf/loadBalancerIPs: 10.0.2.254
+
+    dnsmasq:
+      customSettings:
+        otherSettings: |
+          dhcp-option=option:dns-server,10.0.2.254,10.0.0.1
+
+    extraEnvVars:
+      TZ: Australia/Hobart
+      FTLCONF_dhcp_active: TRUE
+      FTLCONF_dhcp_start: 10.0.3.1
+      FTLCONF_dhcp_end: 10.0.3.254
+      FTLCONF_dhcp_netmask: 255.255.240.0
+      FTLCONF_dhcp_router: 10.0.0.1
+      FTLCONF_dhcp_hosts: cc:f9:57:c5:fd:e9,10.0.3.1,inverter;7c:49:eb:98:40:9c,10.0.3.2,valetudo
+      FTLCONF_dns_domain: lan
+      FTLCONF_dns_hosts: 10.0.0.1 gateway.lan;10.0.2.1 k.lan;10.0.2.254 pihole.lan;10.0.1.1 k0.lan;10.0.1.2 k1.lan;10.0.1.3 k2.lan
+      FTLCONF_dns_listeningMode: ALL

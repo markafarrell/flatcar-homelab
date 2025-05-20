@@ -1,0 +1,25 @@
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  namespace: kube-system
+  name: kube-prometheus-stack
+spec:
+  targetNamespace: monitoring
+  createNamespace: true
+  version: 70.9.0
+  chart: kube-prometheus-stack
+  repo: https://prometheus-community.github.io/helm-charts
+  valuesContent: |-
+    grafana:
+      ingress:
+        enabled: true
+        annotations:
+          kubernetes.io/ingress.class: nginx
+          cert-manager.io/cluster-issuer: "letsencrypt-prod"
+        hosts:
+          - grafana.homelab.evilcyborgdrone.com
+        tls:
+          - hosts:
+            - grafana.homelab.evilcyborgdrone.com
+            secretName: grafana-tls
