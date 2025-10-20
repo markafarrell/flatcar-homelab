@@ -1,28 +1,63 @@
 apiVersion: fluxcd.controlplane.io/v1
-kind: FluxInstance
+kind: ResourceSet
 metadata:
-  name: flux
+  name: flux-operator
   namespace: flux-system
   annotations:
     fluxcd.controlplane.io/reconcile: "enabled"
-    fluxcd.controlplane.io/reconcileEvery: "1h"
+    fluxcd.controlplane.io/reconcileEvery: "30m"
     fluxcd.controlplane.io/reconcileTimeout: "5m"
 spec:
-  distribution:
-    version: "2.x"
-    registry: "ghcr.io/fluxcd"
-  components:
-    - source-controller
-    - kustomize-controller
-    - helm-controller
-    - notification-controller
-  cluster:
-    size: small
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: flux
-  sync:
-    kind: GitRepository
-    url: "https://github.com/markafarrell/flatcar-homelab.git"
-    ref: "refs/heads/feature/flux"
-    path: "flux/clusters/homelab"
+  resources:
+    - apiVersion: fluxcd.controlplane.io/v1
+      kind: FluxInstance
+      metadata:
+        name: flux
+        namespace: flux-system
+        annotations:
+          fluxcd.controlplane.io/reconcile: "enabled"
+          fluxcd.controlplane.io/reconcileEvery: "1h"
+          fluxcd.controlplane.io/reconcileTimeout: "5m"
+      spec:
+        distribution:
+          version: "2.x"
+          registry: "ghcr.io/fluxcd"
+        components:
+          - source-controller
+          - kustomize-controller
+          - helm-controller
+          - notification-controller
+        cluster:
+          size: small
+        commonMetadata:
+          labels:
+            app.kubernetes.io/name: flux
+
+    - apiVersion: source.toolkit.fluxcd.io/v1
+      kind: GitRepository
+      metadata:
+        name: flux-system
+        namespace: flux-system
+      spec:
+        interval: 1m0s
+        ref:
+          name: refs/heads/feature/flux
+        timeout: 60s
+        url: https://github.com/markafarrell/flatcar-homelab.git
+
+    - apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: flux-system
+      spec:
+        force: false
+        interval: 10m0s
+        path: flux/clusters/homelab
+        prune: true
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+        decryption:
+          provider: sops
+          secretRef:
+            name: sops-age
