@@ -22,3 +22,8 @@ resources:
 
   # dex
   - ../../base/apps/dex.yml
+
+  # rook-ceph
+  - ../../base/apps/rook-ceph-operator.yml
+  - ../../base/apps/rook-ceph-cluster.yml
+  - ../../base/apps/rook-ceph.yml
