@@ -13,3 +13,6 @@ resources:
 
   # kured
   - ../../base/apps/kured.yml
+
+  # ingress-nginx
+  - ../../base/apps/ingress-nginx.yml
