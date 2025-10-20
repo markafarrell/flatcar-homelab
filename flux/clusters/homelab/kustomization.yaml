@@ -19,3 +19,6 @@ resources:
 
   # cert-manager
   - ../../base/apps/cert-manager.yml
+
+  # dex
+  - ../../base/apps/dex.yml
