@@ -1,3 +1,10 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: route53-dynamic-dns
+
+---
 apiVersion: fluxcd.controlplane.io/v1
 kind: ResourceSet
 metadata:
@@ -9,11 +16,6 @@ metadata:
     fluxcd.controlplane.io/reconcileTimeout: "5m"
 spec:
   resources:
-    - apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: route53-dynamic-dns
-
     - apiVersion: source.toolkit.fluxcd.io/v1
       kind: HelmRepository
       metadata:
