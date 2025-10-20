@@ -16,3 +16,6 @@ resources:
 
   # ingress-nginx
   - ../../base/apps/ingress-nginx.yml
+
+  # cert-manager
+  - ../../base/apps/cert-manager.yml
