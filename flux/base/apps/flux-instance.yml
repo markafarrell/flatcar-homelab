@@ -24,6 +24,5 @@ spec:
   sync:
     kind: GitRepository
     url: "https://github.com/markafarrell/flatcar-homelab.git"
-    ref: "refs/heads/main"
+    ref: "refs/heads/feature/flux"
     path: "flux/clusters/homelab"
-    pullSecret: "github-token"
