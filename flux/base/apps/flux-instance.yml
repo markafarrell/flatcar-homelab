@@ -1,7 +1,7 @@
 apiVersion: fluxcd.controlplane.io/v1
 kind: ResourceSet
 metadata:
-  name: flux-operator
+  name: flux-instance
   namespace: flux-system
   annotations:
     fluxcd.controlplane.io/reconcile: "enabled"
@@ -49,6 +49,7 @@ spec:
       kind: Kustomization
       metadata:
         name: flux-system
+        namespace: flux-system
       spec:
         force: false
         interval: 10m0s
