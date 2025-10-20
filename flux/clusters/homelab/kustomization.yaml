@@ -5,3 +5,5 @@ kind: Kustomization
 resources:
   - ../../base/apps/flux-operator.yml
   - ../../base/apps/flux-instance.yml
+  - https://kube-vip.io/manifests/rbac.yaml
+  - ../../base/apps/kube-vip.yml
