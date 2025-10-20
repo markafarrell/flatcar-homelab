@@ -1,0 +1,29 @@
+apiVersion: fluxcd.controlplane.io/v1
+kind: FluxInstance
+metadata:
+  name: flux
+  namespace: flux-system
+  annotations:
+    fluxcd.controlplane.io/reconcile: "enabled"
+    fluxcd.controlplane.io/reconcileEvery: "1h"
+    fluxcd.controlplane.io/reconcileTimeout: "5m"
+spec:
+  distribution:
+    version: "2.x"
+    registry: "ghcr.io/fluxcd"
+  components:
+    - source-controller
+    - kustomize-controller
+    - helm-controller
+    - notification-controller
+  cluster:
+    size: small
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: flux
+  sync:
+    kind: GitRepository
+    url: "https://github.com/markafarrell/flatcar-homelab.git"
+    ref: "refs/heads/main"
+    path: "flux/clusters/homelab"
+    pullSecret: "github-token"
