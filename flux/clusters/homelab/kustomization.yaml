@@ -40,3 +40,6 @@ resources:
 
   # fronius-exporter
   - ../../base/apps/fronius-exporter.yml
+
+  # grafana
+  - ../../base/apps/grafana-operator.yml
