@@ -33,3 +33,6 @@ resources:
   # route53-dynamic-dns
   - ../../base/apps/route53-dynamic-dns.yml
   - ../../base/apps/route53-dynamic-dns-secret.yml
+
+  # victoria-metrics
+  - ../../base/apps/victoria-metrics-operator.yml
