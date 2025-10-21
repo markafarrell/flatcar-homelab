@@ -19,6 +19,7 @@ resources:
 
   # cert-manager
   - ../../base/apps/cert-manager.yml
+  - ../../base/apps/cert-manager-cluster-issurer.yml
 
   # dex
   - ../../base/apps/dex.yml
