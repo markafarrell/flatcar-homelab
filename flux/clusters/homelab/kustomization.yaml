@@ -36,3 +36,4 @@ resources:
 
   # victoria-metrics
   - ../../base/apps/victoria-metrics-operator.yml
+  - ../../base/apps/victoria-metrics.yml
