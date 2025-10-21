@@ -37,3 +37,6 @@ resources:
   # victoria-metrics
   - ../../base/apps/victoria-metrics-operator.yml
   - ../../base/apps/victoria-metrics.yml
+
+  # fronius-exporter
+  - ../../base/apps/fronius-exporter.yml

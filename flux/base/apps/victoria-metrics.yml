@@ -62,23 +62,23 @@ spec:
     #         interval: 10s
     #         honorLabels: true
 
-    # - apiVersion: operator.victoriametrics.com/v1beta1
-    #   kind: VMServiceScrape
-    #   metadata:
-    #     name: fronius-exporter
-    #     namespace: fronius-exporter
-    #     labels:
-    #       team: fronius-exporter
-    #   spec:
-    #     namespaceSelector:
-    #       matchNames:
-    #         - fronius-exporter
-    #     selector:
-    #       matchLabels:
-    #         app.kubernetes.io/name: fronius-exporter
-    #         app.kubernetes.io/instance: fronius-exporter
-    #     endpoints:
-    #       - port: http
-    #         path: /metrics
-    #         interval: 10s
-    #         honorLabels: true
+    - apiVersion: operator.victoriametrics.com/v1beta1
+      kind: VMServiceScrape
+      metadata:
+        name: fronius-exporter
+        namespace: fronius-exporter
+        labels:
+          team: fronius-exporter
+      spec:
+        namespaceSelector:
+          matchNames:
+            - fronius-exporter
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: fronius-exporter
+            app.kubernetes.io/instance: fronius-exporter
+        endpoints:
+          - port: http
+            path: /metrics
+            interval: 10s
+            honorLabels: true
