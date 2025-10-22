@@ -39,7 +39,7 @@ spec:
       spec:
         selectAllByDefault: true
         remoteWrite:
-          - url: "http://vmsingle-vm.vm.svc:8429/api/v1/write"
+          - url: "http://vmsingle-vm.victoria-metrics.svc:8429/api/v1/write"
 
     # - apiVersion: operator.victoriametrics.com/v1beta1
     #   kind: VMServiceScrape
