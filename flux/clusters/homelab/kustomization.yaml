@@ -45,3 +45,6 @@ resources:
   - ../../base/apps/grafana-operator.yml
   - ../../base/apps/grafana.yml
   - ../../base/apps/grafana-secret.yml
+
+  # pihole
+  - ../../base/apps/pihole.yml
